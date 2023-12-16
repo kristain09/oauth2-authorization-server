@@ -15,6 +15,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
@@ -43,7 +45,7 @@ import java.util.UUID;
 public class SecurityConfig {
     @Order(1)
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+    public SecurityFilterChain securityFilterChainOauth(HttpSecurity httpSecurity) throws Exception {
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(httpSecurity);
 
         httpSecurity.getConfigurer(OAuth2AuthorizationServerConfigurer.class);
@@ -56,5 +58,23 @@ public class SecurityConfig {
         return httpSecurity.build();
     }
 
+    @Order(2)
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity.authorizeHttpRequests(
+                c -> c.anyRequest().authenticated()
+        ).formLogin(Customizer.withDefaults());
+        return httpSecurity.build();
+    }
 
+    @Bean
+    public UserDetailsService userDetailsService() {
+        UserDetails kristain = User.withUsername("kristain").password("password").build();
+        return new InMemoryUserDetailsManager(kristain);
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return NoOpPasswordEncoder.getInstance();
+    }
 }
