@@ -50,7 +50,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChainOauth(HttpSecurity httpSecurity) throws Exception {
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(httpSecurity);
 
-        httpSecurity.getConfigurer(OAuth2AuthorizationServerConfigurer.class);
+        httpSecurity.getConfigurer(OAuth2AuthorizationServerConfigurer.class).oidc(Customizer.withDefaults());
         httpSecurity.exceptionHandling(
                 exception -> exception.authenticationEntryPoint(
                         new LoginUrlAuthenticationEntryPoint("/login")
